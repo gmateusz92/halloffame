@@ -27,6 +27,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+LOGIN_URL = 'login'  
+LOGIN_REDIRECT_URL = 'home' #do wylogowywania i logowania
+LOGOUT_REDIRECT_URL = 'home'
+
 
 # Application definition
 
