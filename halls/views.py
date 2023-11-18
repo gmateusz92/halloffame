@@ -5,8 +5,9 @@ from django.urls import reverse_lazy
 from django.views import generic
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, login
-from .models import Hall
-from .forms import VideoForm
+from .models import Hall, Video
+from .forms import VideoForm, SearchForm
+from django.http import Http404
 
 
 # Create your views here.
@@ -15,6 +16,8 @@ from .forms import VideoForm
 #     popular_halls = [Hall.objects.get(pk=1),Hall.objects.get(pk=2),Hall.objects.get(pk=3)]
 #     return render(request, 'halls/home.html', {'recent_halls':recent_halls, 'popular_halls':popular_halls})
 
+youtube_api_key = 'AIzaSyDA3SNzwY4FiTQ9chdwmcEL5Kk0QBPlSWg'
+
 def home(request):
     return render(request, 'halls/home.html')
 
@@ -22,10 +25,25 @@ def dashboard(request):
     halls = Hall.objects.filter(user=request.user)
     return render(request, 'halls/dashboard.html', {'halls':halls})
 
-def add_video(request, pk):
+def add_video(request, pk): #pip install django-widget-tweaks
     form = VideoForm()
+    search_form = SearchForm()
+    hall = Hall.objects.get(pk=pk)
+    if not hall.user == request.user:
+        raise Http404
 
-    return render(request, 'halls/add_video.html', {'form': form})
+    if request.method == 'POST':
+        # Create
+        filled_form = VideoForm(request.POST)
+        if filled_form.is_valid():
+            video = Video()
+            video.url = filled_form.cleaned_data['url']
+            video.title = filled_form.cleaned_data['title']
+            video.youtube_id = filled_form.cleaned_data['youtube_id']
+            video.hall = hall
+            video.save()
+
+    return render(request, 'halls/add_video.html', {'form': form, 'search_form': search_form, 'hall': hall})
 
 
 class SignUp(generic.CreateView):
