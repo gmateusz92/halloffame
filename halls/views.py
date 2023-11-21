@@ -65,6 +65,11 @@ def video_search(request):
         return JsonResponse(response.json())
     return JsonResponse({'error':'not able to validate form'})
 
+class DeleteVideo(generic.DeleteView):
+    model = Video
+    template_name = 'halls/delete_video.html'  # Dodaj odpowiedni szablon
+    success_url = reverse_lazy('dashboard') 
+
 class SignUp(generic.CreateView):
     form_class = UserCreationForm
     success_url = reverse_lazy('home')
@@ -85,10 +90,10 @@ class CreateHall(generic.CreateView): #generic views to gdy uzytkownik nie musi 
     template_name = 'halls/create_hall.html'
     success_url = reverse_lazy('dashboard')
 
-    def form_valid(self, form):
+    def form_valid(self, form): #przypisuje obiekt do uzytkownika
         form.instance.user = self.request.user
         super(CreateHall, self).form_valid(form)
-        return redirect('home')
+        return redirect('dashboard')
     
 class DetailHall(generic.DetailView):
     model = Hall
@@ -104,3 +109,5 @@ class DeleteHall(generic.DeleteView):
     model = Hall
     template_name = 'halls/delete_hall.html'  # Dodaj odpowiedni szablon
     success_url = reverse_lazy('dashboard')      
+
+    
